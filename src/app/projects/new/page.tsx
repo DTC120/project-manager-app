@@ -7,19 +7,25 @@ export default function NewProject() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [driveLinks, setDriveLinks] = useState<string[]>(['']);
+  const [error, setError] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const filteredLinks = driveLinks.filter(link => link.trim() !== '');
+    const filteredLinks = driveLinks.filter((link) => link.trim() !== '');
     const res = await fetch('/api/projects', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, description, driveLinks: filteredLinks, tasks: [] }),
     });
-    if (res.ok) {
-      router.push('/');
+
+    if (!res.ok) {
+      const data = await res.json();
+      setError(data.error || 'Failed to create project');
+      return;
     }
+
+    router.push('/');
   };
 
   const addLink = () => setDriveLinks([...driveLinks, '']);
@@ -33,55 +39,83 @@ export default function NewProject() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <div className="max-w-2xl mx-auto bg-white p-6 rounded shadow">
-        <h1 className="text-2xl font-bold mb-4">Create New Project</h1>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700">Name</label>
+    <div className="min-h-screen bg-slate-50 p-4 sm:p-6">
+      <div className="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+        <div className="mb-8 space-y-3">
+          <h1 className="text-3xl font-semibold text-slate-900">Create New Project</h1>
+          <p className="text-slate-600">Add project details, cloud links, and start organizing tasks.</p>
+        </div>
+
+        {error ? (
+          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        ) : null}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-800">Project Name</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full p-2 border rounded"
+              className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
               required
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Description</label>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-800">Description</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full p-2 border rounded"
+              className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+              rows={4}
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Google Drive Links</label>
-            {driveLinks.map((link, index) => (
-              <div key={index} className="flex mb-2">
-                <input
-                  type="url"
-                  value={link}
-                  onChange={(e) => updateLink(index, e.target.value)}
-                  className="flex-1 p-2 border rounded"
-                  placeholder="https://drive.google.com/..."
-                />
-                <button
-                  type="button"
-                  onClick={() => removeLink(index)}
-                  className="ml-2 bg-red-500 text-white px-2 rounded"
-                >
-                  Remove
-                </button>
-              </div>
-            ))}
-            <button type="button" onClick={addLink} className="bg-green-500 text-white px-4 py-2 rounded">
-              Add Link
+          <div>
+            <div className="mb-3 flex items-center justify-between">
+              <label className="text-sm font-medium text-slate-800">Google Drive Links</label>
+              <button
+                type="button"
+                onClick={addLink}
+                className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
+              >
+                Add Link
+              </button>
+            </div>
+            <div className="space-y-3">
+              {driveLinks.map((link, index) => (
+                <div key={index} className="flex gap-3">
+                  <input
+                    type="url"
+                    value={link}
+                    onChange={(e) => updateLink(index, e.target.value)}
+                    className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                    placeholder="https://drive.google.com/..."
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeLink(index)}
+                    className="rounded-2xl bg-red-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <button type="submit" className="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">
+              Create Project
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push('/')}
+              className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+            >
+              Cancel
             </button>
           </div>
-          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-            Create Project
-          </button>
         </form>
       </div>
     </div>

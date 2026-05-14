@@ -14,51 +14,113 @@ interface Project {
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadProjects() {
-      const res = await fetch('/api/projects');
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || 'Failed to load projects');
+      try {
+        const res = await fetch('/api/projects');
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data.error || 'Failed to load projects');
+          setProjects([]);
+          return;
+        }
+        if (!Array.isArray(data)) {
+          setError('Unexpected API response');
+          setProjects([]);
+          return;
+        }
+        setProjects(data);
+      } catch (err) {
+        setError('Unable to fetch projects');
         setProjects([]);
-        return;
+      } finally {
+        setLoading(false);
       }
-      if (!Array.isArray(data)) {
-        setError('Unexpected API response');
-        setProjects([]);
-        return;
-      }
-      setProjects(data);
     }
 
     loadProjects();
   }, []);
 
+  const deleteProject = async (id: string) => {
+    const confirmed = window.confirm('Are you sure you want to delete this project?');
+    if (!confirmed) return;
+
+    const res = await fetch(`/api/projects/${id}`, {
+      method: 'DELETE',
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      setError(data.error || 'Failed to delete project');
+      return;
+    }
+
+    setProjects((current) => current.filter((project) => project._id !== id));
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Project Manager</h1>
-        <Link href="/projects/new" className="bg-blue-500 text-white px-4 py-2 rounded mb-4 inline-block">
-          Add New Project
-        </Link>
+    <div className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl">
+        <header className="mb-8 flex flex-col gap-4 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-4xl font-semibold tracking-tight text-slate-900">Project Manager</h1>
+            <p className="mt-2 text-slate-600">Organiza tus proyectos, tareas y enlaces de la nube desde una sola app.</p>
+          </div>
+          <Link
+            href="/projects/new"
+            className="inline-flex items-center justify-center rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+          >
+            Add New Project
+          </Link>
+        </header>
+
         {error ? (
-          <div className="mb-4 rounded border border-red-400 bg-red-50 p-4 text-red-700">
+          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-red-700 shadow-sm">
             {error}
           </div>
         ) : null}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {projects.map(project => (
-            <div key={project._id} className="bg-white p-4 rounded shadow">
-              <h2 className="text-xl font-semibold">{project.name}</h2>
-              <p className="text-gray-600">{project.description}</p>
-              <p className="text-sm">Tasks: {project.tasks.length}</p>
-              <Link href={`/projects/${project._id}`} className="text-blue-500 mt-2 inline-block">
-                View Details
-              </Link>
-            </div>
-          ))}
-        </div>
+
+        {loading ? (
+          <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-slate-600 shadow-sm">Loading projects...</div>
+        ) : projects.length === 0 ? (
+          <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-12 text-center text-slate-600 shadow-sm">
+            No projects yet. Create your first project to start organizing tasks and links.
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {projects.map((project) => (
+              <div key={project._id} className="overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+                <div className="mb-4 flex items-start justify-between gap-4">
+                  <div>
+                    <h2 className="text-xl font-semibold text-slate-900">{project.name}</h2>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">{project.description || 'No description provided.'}</p>
+                  </div>
+                </div>
+                <div className="mb-4 flex flex-wrap gap-3 text-sm text-slate-600">
+                  <span className="rounded-full bg-slate-100 px-3 py-1">{project.tasks.length} tasks</span>
+                  <span className="rounded-full bg-slate-100 px-3 py-1">{project.driveLinks.length} cloud links</span>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <Link
+                    href={`/projects/${project._id}`}
+                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                  >
+                    View Details
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => deleteProject(project._id)}
+                    className="inline-flex items-center justify-center rounded-full bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

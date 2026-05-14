@@ -8,7 +8,9 @@ export async function GET() {
     const projects = await Project.find({});
     return NextResponse.json(projects);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch projects' }, { status: 500 });
+    console.error('GET /api/projects error:', error);
+    const message = error instanceof Error ? error.message : 'Failed to fetch projects';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -20,6 +22,8 @@ export async function POST(request: NextRequest) {
     await project.save();
     return NextResponse.json(project, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to create project' }, { status: 500 });
+    console.error('POST /api/projects error:', error);
+    const message = error instanceof Error ? error.message : 'Failed to create project';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
