@@ -22,18 +22,18 @@ export default function Home() {
         const res = await fetch('/api/projects');
         const data = await res.json();
         if (!res.ok) {
-          setError(data.error || 'Failed to load projects');
+          setError(data.error || 'Fallo al cargar los proyectos');
           setProjects([]);
           return;
         }
         if (!Array.isArray(data)) {
-          setError('Unexpected API response');
+          setError('Respuesta API inesperada');
           setProjects([]);
           return;
         }
         setProjects(data);
       } catch (err) {
-        setError('Unable to fetch projects');
+        setError('Fallo al cargar los proyectos');
         setProjects([]);
       } finally {
         setLoading(false);
@@ -44,7 +44,7 @@ export default function Home() {
   }, []);
 
   const deleteProject = async (id: string) => {
-    const confirmed = window.confirm('Are you sure you want to delete this project?');
+    const confirmed = window.confirm('Estas seguro de que quieres eliminar este proyecto? Esta acción no se puede deshacer.');
     if (!confirmed) return;
 
     const res = await fetch(`/api/projects/${id}`, {
@@ -53,7 +53,7 @@ export default function Home() {
 
     if (!res.ok) {
       const data = await res.json();
-      setError(data.error || 'Failed to delete project');
+      setError(data.error || 'Fallo al eliminar el proyecto');
       return;
     }
 
@@ -72,7 +72,7 @@ export default function Home() {
             href="/projects/new"
             className="inline-flex items-center justify-center rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
           >
-            Add New Project
+            Añadir nuevo proyecto
           </Link>
         </header>
 
@@ -83,10 +83,10 @@ export default function Home() {
         ) : null}
 
         {loading ? (
-          <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-slate-600 shadow-sm">Loading projects...</div>
+          <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-slate-600 shadow-sm">Cargando Proyectos...</div>
         ) : projects.length === 0 ? (
           <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-12 text-center text-slate-600 shadow-sm">
-            No projects yet. Create your first project to start organizing tasks and links.
+            Aún sin proyectos. Crea tu primer proyecto para empezar a organizar tus tareas y enlaces de la nube.
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -99,22 +99,22 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="mb-4 flex flex-wrap gap-3 text-sm text-slate-600">
-                  <span className="rounded-full bg-slate-100 px-3 py-1">{project.tasks.length} tasks</span>
-                  <span className="rounded-full bg-slate-100 px-3 py-1">{project.driveLinks.length} cloud links</span>
+                  <span className="rounded-full bg-slate-100 px-3 py-1">{project.tasks.length} Tareas</span>
+                  <span className="rounded-full bg-slate-100 px-3 py-1">{project.driveLinks.length} Links en la nube</span>
                 </div>
                 <div className="flex flex-wrap gap-3">
                   <Link
                     href={`/projects/${project._id}`}
                     className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
                   >
-                    View Details
+                    Mostrar detalles
                   </Link>
                   <button
                     type="button"
                     onClick={() => deleteProject(project._id)}
                     className="inline-flex items-center justify-center rounded-full bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700"
                   >
-                    Delete
+                    Eliminar
                   </button>
                 </div>
               </div>

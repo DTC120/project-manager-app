@@ -21,7 +21,7 @@ export default function NewProject() {
 
     if (!res.ok) {
       const data = await res.json();
-      setError(data.error || 'Failed to create project');
+      setError(data.error || 'Fallo al crear el proyecto');
       return;
     }
 

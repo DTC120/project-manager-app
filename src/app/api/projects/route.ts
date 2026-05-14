@@ -9,7 +9,7 @@ export async function GET() {
     return NextResponse.json(projects);
   } catch (error) {
     console.error('GET /api/projects error:', error);
-    const message = error instanceof Error ? error.message : 'Failed to fetch projects';
+    const message = error instanceof Error ? error.message : 'Fallo al cargar los proyectos';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(project, { status: 201 });
   } catch (error) {
     console.error('POST /api/projects error:', error);
-    const message = error instanceof Error ? error.message : 'Failed to create project';
+    const message = error instanceof Error ? error.message : 'Fallo al crear el proyecto';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

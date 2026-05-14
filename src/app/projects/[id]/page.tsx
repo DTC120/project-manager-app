@@ -29,7 +29,7 @@ export default function ProjectDetail() {
         const res = await fetch(`/api/projects/${id}`);
         const data = await res.json();
         if (!res.ok) {
-          setError(data.error || 'Failed to load project');
+          setError(data.error || 'Fallo al cargar el proyecto');
           return;
         }
         setProject(data);
