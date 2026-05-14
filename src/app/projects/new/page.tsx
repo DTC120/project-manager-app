@@ -42,8 +42,8 @@ export default function NewProject() {
     <div className="min-h-screen bg-slate-50 p-4 sm:p-6">
       <div className="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
         <div className="mb-8 space-y-3">
-          <h1 className="text-3xl font-semibold text-slate-900">Create New Project</h1>
-          <p className="text-slate-600">Add project details, cloud links, and start organizing tasks.</p>
+          <h1 className="text-3xl font-semibold text-slate-900">Crea un Nuevo Proyecto</h1>
+          <p className="text-slate-600">Agrega detalles del proyecto, links en la nube y comienza a organizar tareas.</p>
         </div>
 
         {error ? (
@@ -54,7 +54,7 @@ export default function NewProject() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-800">Project Name</label>
+            <label className="mb-2 block text-sm font-medium text-slate-800">Nombre del proyecto</label>
             <input
               type="text"
               value={name}
@@ -64,7 +64,7 @@ export default function NewProject() {
             />
           </div>
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-800">Description</label>
+            <label className="mb-2 block text-sm font-medium text-slate-800">Descripción</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -80,7 +80,7 @@ export default function NewProject() {
                 onClick={addLink}
                 className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
               >
-                Add Link
+                Agregar Link
               </button>
             </div>
             <div className="space-y-3">
@@ -98,7 +98,7 @@ export default function NewProject() {
                     onClick={() => removeLink(index)}
                     className="rounded-2xl bg-red-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
                   >
-                    Remove
+                    Eliminar
                   </button>
                 </div>
               ))}
@@ -106,14 +106,14 @@ export default function NewProject() {
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <button type="submit" className="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">
-              Create Project
+              Crear Proyecto
             </button>
             <button
               type="button"
               onClick={() => router.push('/')}
               className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
             >
-              Cancel
+              Cancelar
             </button>
           </div>
         </form>
