@@ -13,11 +13,26 @@ interface Project {
 
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch('/api/projects')
-      .then(res => res.json())
-      .then(setProjects);
+    async function loadProjects() {
+      const res = await fetch('/api/projects');
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || 'Failed to load projects');
+        setProjects([]);
+        return;
+      }
+      if (!Array.isArray(data)) {
+        setError('Unexpected API response');
+        setProjects([]);
+        return;
+      }
+      setProjects(data);
+    }
+
+    loadProjects();
   }, []);
 
   return (
@@ -27,6 +42,11 @@ export default function Home() {
         <Link href="/projects/new" className="bg-blue-500 text-white px-4 py-2 rounded mb-4 inline-block">
           Add New Project
         </Link>
+        {error ? (
+          <div className="mb-4 rounded border border-red-400 bg-red-50 p-4 text-red-700">
+            {error}
+          </div>
+        ) : null}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {projects.map(project => (
             <div key={project._id} className="bg-white p-4 rounded shadow">
